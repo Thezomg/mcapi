@@ -1,0 +1,6 @@
+build/
+docs/_build
+mcapi.egg-info/
+*.pyc
+*.swp
+*.egg
