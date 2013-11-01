@@ -8,4 +8,5 @@ setup(
     install_requires=['requests'],
     author='Deaygo',
     author_email='deaygo@thezomg.com',
+    packages=['mcapi']
 )
