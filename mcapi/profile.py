@@ -11,14 +11,24 @@ class ProfileCriteria(dict):
         self['name'] = name
         self['agent'] = agent
 
-def get_uuid(name):
-    crit = [ProfileCriteria(name, AGENT)]
-    url = PROFILE_URL.format(page=1)
-    data = json.dumps(crit)
-    headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
-    r = requests.post(url, data=data, headers=headers)
-    profiles = r.json()
-    if 'profiles' in profiles:
-        if profiles['size'] == 1:
-            return profiles['profiles'][0]
-    return None
+def get_uuid(*name):
+    if len(name) == 0:
+        return None
+    crit = [ProfileCriteria(x, AGENT) for x in name]
+    p = []
+
+    page = 1
+    while True:
+        url = PROFILE_URL.format(page=page)
+        data = json.dumps(crit)
+        headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+        r = requests.post(url, data=data, headers=headers)
+        profiles = r.json()
+        if 'profiles' in profiles:
+            if profiles['size'] == 0:
+                break
+            p.extend(profiles['profiles'])
+
+        page += 1
+                
+    return p
