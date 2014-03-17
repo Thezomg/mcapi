@@ -5,11 +5,22 @@ import json
 
 AGENT = "minecraft"
 PROFILE_URL = "https://api.mojang.com/profiles/page/{page}"
+UUID_PROFILE_URL = 'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}'
 
 class ProfileCriteria(dict):
     def __init__(self, name, agent):
         self['name'] = name
         self['agent'] = agent
+
+def get_profile(uuid):
+    url = UUID_PROFILE_URL.format(uuid=uuid)
+    try:
+        r = requests.get(url)
+        profile = r.json()
+    except:
+        profile = None
+
+    return profile
 
 def get_uuid(*name):
     if len(name) == 0:
