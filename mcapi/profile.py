@@ -12,17 +12,20 @@ class ProfileCriteria(dict):
         self['name'] = name
         self['agent'] = agent
 
-def get_profile(uuid):
+def get_profile(uuid, timeout=10):
     url = UUID_PROFILE_URL.format(uuid=uuid)
     try:
-        r = requests.get(url)
+        r = requests.get(url, timeout=timeout)
         profile = r.json()
     except:
         profile = None
 
     return profile
 
-def get_uuid(*name):
+def get_uuid(*name, **kwargs):
+    timeout = 10
+    if "timeout" in kwargs:
+        timeout = kwargs["timeout"]
     if len(name) == 0:
         return None
     crit = [ProfileCriteria(x, AGENT) for x in name]
@@ -33,7 +36,7 @@ def get_uuid(*name):
         url = PROFILE_URL.format(page=page)
         data = json.dumps(crit)
         headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
-        r = requests.post(url, data=data, headers=headers)
+        r = requests.post(url, data=data, headers=headers, timeout=timeout)
         profiles = r.json()
         if 'profiles' in profiles:
             if profiles['size'] == 0:
