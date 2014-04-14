@@ -4,7 +4,7 @@ import requests
 import json
 
 AGENT = "minecraft"
-PROFILE_URL = "https://api.mojang.com/profiles/page/{page}"
+PROFILE_URL = "https://api.mojang.com/profiles/minecraft"
 UUID_PROFILE_URL = 'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}'
 
 class ProfileCriteria(dict):
@@ -28,20 +28,19 @@ def get_uuid(*name, **kwargs):
         timeout = kwargs["timeout"]
     if len(name) == 0:
         return None
-    crit = [ProfileCriteria(x, AGENT) for x in name]
     p = []
 
     page = 1
     while True:
-        url = PROFILE_URL.format(page=page)
+        if len(name) == 0:
+            break
+        crit = name[:100]
+        name = name [100:]
         data = json.dumps(crit)
         headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
-        r = requests.post(url, data=data, headers=headers, timeout=timeout)
+        r = requests.post(PROFILE_URL, data=data, headers=headers, timeout=timeout)
         profiles = r.json()
-        if 'profiles' in profiles:
-            if profiles['size'] == 0:
-                break
-            p.extend(profiles['profiles'])
+        p.extend(profiles)
 
         page += 1
                 
