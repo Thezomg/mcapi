@@ -3,6 +3,8 @@
 import requests
 import json
 
+from .exceptions import RateLimited
+
 AGENT = "minecraft"
 PROFILE_URL = "https://api.mojang.com/profiles/minecraft"
 UUID_PROFILE_URL = 'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}'
@@ -39,6 +41,8 @@ def get_uuid(*name, **kwargs):
         data = json.dumps(crit)
         headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
         r = requests.post(PROFILE_URL, data=data, headers=headers, timeout=timeout)
+        if r.status_code == 429:
+            raise RateLimited(r.text)
         profiles = r.json()
         p.extend(profiles)
 
